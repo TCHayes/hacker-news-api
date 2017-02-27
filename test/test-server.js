@@ -24,7 +24,7 @@ function seedData() {
     });
   }
   return NewsItem.insertMany(seedData);
-}
+};
 
 function tearDownDb() {
   return new Promise ((resolve, reject) => {
@@ -33,7 +33,7 @@ function tearDownDb() {
       .then(result => resolve(result))
       .catch(err => reject (err))
   });
-}
+};
 
 describe('Hacker News API', function() {
   before(function() {
@@ -85,7 +85,7 @@ describe('Hacker News API', function() {
             item.should.include.keys('id', 'title', 'url', 'votes');
           });
           resNewsItem = res.body[0];
-          return NewsItem.findById(resNewsItem.id).exec()
+          return NewsItem.findById(resNewsItem.id);
         })
         .then(function(item) {
           resNewsItem.id.should.equal(item.id);
@@ -95,6 +95,38 @@ describe('Hacker News API', function() {
         });
     });
   });
+
+  describe('POST endpoint', function() {
+
+    it('should add a new news item', function() {
+      const newItem = {
+        title: faker.lorem.sentence(),
+        url: faker.internet.url()
+      };
+
+      return chai.request(app)
+        .post('/stories')
+        .send(newItem)
+        .then(function(res) {
+          res.should.have.status(201);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          res.body.should.include.keys('id', 'title', 'url', 'votes');
+          res.body.title.should.equal(newItem.title);
+          res.body.id.should.not.be.null;
+          res.body.url.should.equal(newItem.url);
+          res.body.votes.should.equal(0);
+          return NewsItem.findById(res.body.id);
+        })
+        .then(function(item) {
+          item.title.should.equal(newItem.title);
+          item.url.should.equal(newItem.url);
+          item.votes.should.equal(0);
+        });
+    });
+  });
+
+
 
 
 });
