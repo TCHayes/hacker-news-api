@@ -15,12 +15,24 @@ chai.use(chaiHttp);
 
 
 function seedData() {
-    console.info('Seeding data');
+  console.info('Seeding data');
+  const seedData = [];
+  for (let i = 1; i <= 20; i++) {
+    seedData.push({
+      title: faker.lorem.sentence(),
+      url: faker.internet.url()
+    });
+  }
+  return NewsItem.insertMany(seedData);
 }
 
 function tearDownDb() {
-  console.info('Deleting database');
-  return mongoose.connection.dropDatabase();
+  return new Promise ((resolve, reject) => {
+    console.info('Deleting database');
+    mongoose.connection.dropDatabase()
+      .then(result => resolve(result))
+      .catch(err => reject (err))
+  });
 }
 
 describe('Hacker News API', function() {
