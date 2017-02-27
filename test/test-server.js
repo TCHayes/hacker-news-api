@@ -3,12 +3,16 @@ const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const faker = require('faker');
 
+mongoose.Promise = global.Promise;
+
 const should = chai.should();
 
+const {NewsItem} = require('../models');
 const {app, runServer, closeServer} = require('../server');
 
-
 chai.use(chaiHttp);
+
+
 
 function seedData() {
     console.info('Seeding data');
