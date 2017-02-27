@@ -85,9 +85,8 @@ describe('Hacker News API', function() {
             item.should.include.keys('id', 'title', 'url', 'votes');
           });
           resNewsItem = res.body[0];
-          return NewsItem.findById(resNewsItem.id)
+          return NewsItem.findById(resNewsItem.id).exec()
         })
-        .exec()
         .then(function(item) {
           resNewsItem.id.should.equal(item.id);
           resNewsItem.title.should.equal(item.title);

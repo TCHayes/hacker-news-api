@@ -18,7 +18,7 @@ app.get('/stories', (req, res) => {
   NewsItem
     .find()
     .sort({votes: -1})
-    .limit(10)
+    .limit(20)
     .exec()
     .then(newsItem => {
       res.json(newsItem.map(newsItem => newsItem.apiRepr()));
