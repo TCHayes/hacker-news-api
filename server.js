@@ -8,9 +8,32 @@ const DATABASE_URL = process.env.DATABASE_URL ||
                      global.DATABASE_URL ||
                      'mongodb://localhost/hn-api';
 const PORT = process.env.PORT || 8080;
+const {NewsItem} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
+
+app.post('/stories', (req, res) => {
+  const requiredFields = ['title','url'];
+  requiredFields.forEach((field) => {
+    if (!(field in req.body)) {
+      const message = `Missing "${field}" in request body`;
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  });
+
+  NewsItem
+    .create({
+      title: req.body.title,
+      url: req.body.url
+    })
+    .then(newsItem => res.status(201).json(newsItem.apiRepr()))
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({error: 'Internal Server Error'});
+    });
+});
 
 // API endpoints go here
 
