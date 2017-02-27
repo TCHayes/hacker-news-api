@@ -53,16 +53,11 @@ app.post('/stories', (req, res) => {
 });
 
 app.put('/stories/:id', (req, res) => {
-  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
-    res.status(400).json({
-      error: 'Request path id and request body id values must match'
-    });
-  };
 
   NewsItem
     .findByIdAndUpdate(req.params.id, {$inc: {votes: 1}}, {new:true})
     .exec()
-    .then(updatedItem => res.status(204).json(updatedItem.apiRepr()))
+    .then(updatedItem => res.sendStatus(204))
     .catch(err => res.status(500).json({message: "Something went wrong"}));
 });
 

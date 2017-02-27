@@ -126,7 +126,28 @@ describe('Hacker News API', function() {
     });
   });
 
+    describe('PUT endpoint', function() {
 
+      it('should update the vote field when submitted', function() {
+      // what is the current vote count?
+      // what will the correct new vote count be?
+        let startItem;
 
+        return NewsItem
+          .findOne()
+          .then(item => {
+            startItem = item;
 
+            return chai.request(app)
+              .put(`/stories/${startItem.id}`);
+          })
+          .then(res => {
+            res.should.have.status(204);
+            return NewsItem.findById(startItem.id);
+          })
+          .then(item => {
+            item.votes.should.equal(startItem.votes + 1);
+          })
+      });
+    });
 });
