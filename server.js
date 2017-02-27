@@ -16,13 +16,15 @@ app.use(bodyParser.json());
 app.get('/stories', (req, res) => {
   NewsItem
     .find()
+    .sort({votes: -1})
+    .limit(10)
     .exec()
     .then(newsItem => {
       res.json(newsItem.map(newsItem => newsItem.apiRepr()));
     })
     .catch(err => {
       console.error(err);
-      res.status(200).json({error: 'something went wrong'});
+      res.status(500).json({error: 'something went wrong'});
     });
 });
 
@@ -47,6 +49,20 @@ app.post('/stories', (req, res) => {
       console.error(err);
       res.status(500).json({error: 'Internal Server Error'});
     });
+});
+
+app.put('/stories/:id', (req, res) => {
+  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+    res.status(400).json({
+      error: 'Request path id and request body id values must match'
+    });
+  };
+
+  NewsItem
+    .findByIdAndUpdate(req.params.id, {$inc: {votes: 1}}, {new:true})
+    .exec()
+    .then(updatedItem => res.status(204).json(updatedItem.apiRepr()))
+    .catch(err => res.status(500).json({message: "Something went wrong"}));
 });
 
 // API endpoints go here
