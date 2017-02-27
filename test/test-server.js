@@ -50,5 +50,52 @@ describe('Hacker News API', function() {
 
   after(function() {
     return closeServer();
-  })
+  });
+
+  describe('GET endpoint', function() {
+    it('should return all news items', function() {
+
+      let res;
+      return chai.request(app)
+        .get('/stories')
+        .then(function(_res) {
+          res = _res;
+          res.should.have.status(200);
+          res.body.should.have.length.of.at.least(1);
+          return NewsItem.count();
+        })
+        .then(function(count) {
+          res.body.should.have.length.of(count);
+        });
+    });
+
+    it('should return news items with the right fields', function() {
+
+      let resNewsItem;
+      return chai.request(app)
+        .get('/stories')
+        .then(function(res) {
+          res.should.have.status(200);
+          res.should.be.json;
+          res.body.should.be.a('array');
+          res.body.should.have.length.of.at.least(1);
+
+          res.body.forEach(function(item) {
+            item.should.be.a('object');
+            item.should.include.keys('id', 'title', 'url', 'votes');
+          });
+          resNewsItem = res.body[0];
+          return NewsItem.findById(resNewsItem.id)
+        })
+        .exec()
+        .then(function(item) {
+          resNewsItem.id.should.equal(item.id);
+          resNewsItem.title.should.equal(item.title);
+          resNewsItem.url.should.equal(item.url);
+          resNewsItem.votes.should.equal(item.votes);
+        });
+    });
+  });
+
+
 });
