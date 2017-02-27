@@ -13,6 +13,20 @@ const {NewsItem} = require('./models');
 const app = express();
 app.use(bodyParser.json());
 
+app.get('/stories', (req, res) => {
+  NewsItem
+    .find()
+    .exec()
+    .then(newsItem => {
+      res.json(newsItem.map(newsItem => newsItem.apiRepr()));
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(200).json({error: 'something went wrong'});
+    });
+});
+
+
 app.post('/stories', (req, res) => {
   const requiredFields = ['title','url'];
   requiredFields.forEach((field) => {
